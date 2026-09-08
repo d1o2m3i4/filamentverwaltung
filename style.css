@@ -594,3 +594,18 @@ dialog::backdrop {
 .table-rating .empty {
     color: #d1d5db;
 }
+
+
+/* Kleine Versionsanzeige zur Kontrolle nach GitHub-Pages-Updates */
+.app-version {
+    position: fixed;
+    right: 12px;
+    bottom: 10px;
+    z-index: 9999;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(17, 24, 39, 0.78);
+    color: #ffffff;
+    font-size: 11px;
+    pointer-events: none;
+}
