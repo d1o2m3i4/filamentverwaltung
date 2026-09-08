@@ -485,3 +485,65 @@ render = function() {
     buildCostCalculatorRows();
   }
 };
+
+
+
+function setMainTab(tabName) {
+  const management = el("managementView");
+  const calculator = el("calculatorView");
+  const managementTab = el("tabManagement");
+  const calculatorTab = el("tabCalculator");
+
+  const showCalculator = tabName === "calculator";
+
+  management?.classList.toggle("active", !showCalculator);
+  calculator?.classList.toggle("active", showCalculator);
+  managementTab?.classList.toggle("active", !showCalculator);
+  calculatorTab?.classList.toggle("active", showCalculator);
+
+  localStorage.setItem("filament_active_tab_v1", showCalculator ? "calculator" : "management");
+
+  if (showCalculator) {
+    buildCostCalculatorRows();
+    calculatePrintCost();
+  }
+}
+
+function resetCalculator() {
+  const defaults = {
+    calcMachineHours: "0",
+    calcLaborMinutes: "0",
+    calcMachineRate: "2.00",
+    calcLaborRate: "50.00",
+    calcOverhead: "2.00",
+    calcPowerPrice: "0.277",
+    calcPowerUse: "0.20",
+    calcMargin: "10"
+  };
+
+  Object.entries(defaults).forEach(([id, value]) => {
+    if (el(id)) el(id).value = value;
+  });
+
+  document.querySelectorAll(".calc-filament-select").forEach(select => {
+    select.value = "";
+  });
+
+  document.querySelectorAll(".calc-filament-grams").forEach(input => {
+    input.value = "0";
+  });
+
+  calculatePrintCost();
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  el("tabManagement")?.addEventListener("click", () => setMainTab("management"));
+  el("tabCalculator")?.addEventListener("click", () => setMainTab("calculator"));
+  el("resetCalculatorBtn")?.addEventListener("click", resetCalculator);
+
+  const savedTab = localStorage.getItem("filament_active_tab_v1");
+  setMainTab(savedTab === "calculator" ? "calculator" : "management");
+});
+

@@ -7,10 +7,23 @@
   <title>
    Filamentverwaltung
   </title>
-  <link href="style.css?v=7" rel="stylesheet"/>
+  <link href="style.css?v=8" rel="stylesheet"/>
  </head>
  <body>
-  <div id="appVersion" class="app-version">Version 7 · Druckkosten-Rechner</div>
+  <div id="appVersion" class="app-version">Version 8 · Reiter & Druckkosten</div>
+  <div class="main-tabs-wrap">
+   <nav class="main-tabs" id="mainTabs" aria-label="Hauptnavigation">
+    <button class="main-tab active" id="tabManagement" type="button" data-tab="management">
+     Verwaltung
+    </button>
+    <button class="main-tab" id="tabCalculator" type="button" data-tab="calculator">
+     Druckkosten
+    </button>
+   </nav>
+  </div>
+
+  <div class="tab-view active" id="managementView">
+
   <header class="app-header">
    <div>
     <h1>
@@ -209,11 +222,20 @@
    </footer>
   </main>
   
-  <section class="cost-calculator card" id="costCalculator">
+  
+  </div>
+
+  <div class="tab-view" id="calculatorView">
+<section class="cost-calculator card" id="costCalculator">
    <div class="section-head">
     <div>
-     <h2>Druckkosten-Rechner</h2>
-     <p>Berechnet Material, Maschinenzeit, Arbeitszeit, Strom, Nebenkosten und Gewinnmarge.</p>
+     <h2>Druckkosten berechnen</h2>
+     <p>Wähle deine Filamente, trage Zeit und Verbrauch ein – die Kalkulation aktualisiert sich automatisch.</p>
+    </div>
+    <div class="calc-chip-row">
+     <span class="calc-chip">bis 8 Filamente</span>
+     <span class="calc-chip">automatische Kalkulation</span>
+     <span class="calc-chip">10 % Marge</span>
     </div>
    </div>
 
@@ -264,7 +286,10 @@
     </div>
 
     <div class="calculator-summary">
-     <h3>Kalkulation</h3>
+     <div class="summary-head">
+      <h3>Kalkulation</h3>
+      <button class="secondary small-btn" id="resetCalculatorBtn" type="button">Zurücksetzen</button>
+     </div>
      <div class="cost-row"><span>Filament</span><strong id="calcFilamentCost">CHF 0.00</strong></div>
      <div class="cost-row"><span>Maschinenzeit</span><strong id="calcMachineCost">CHF 0.00</strong></div>
      <div class="cost-row"><span>Arbeitszeit</span><strong id="calcLaborCost">CHF 0.00</strong></div>
@@ -276,6 +301,8 @@
     </div>
    </div>
   </section>
+
+  </div>
 
 <dialog id="settingsDialog">
    <form id="settingsForm">
@@ -531,7 +558,7 @@
     </div>
    </div>
   </dialog>
-  <script src="app.js?v=7">
+  <script src="app.js?v=8">
   </script>
  </body>
 </html>
