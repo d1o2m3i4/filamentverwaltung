@@ -1,190 +1,448 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light">
-  <title>Filamentverwaltung</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="light" name="color-scheme"/>
+  <title>
+   Filamentverwaltung
+  </title>
+  <link href="style.css" rel="stylesheet"/>
+ </head>
+ <body>
   <header class="app-header">
-    <div>
-      <h1>Filamentverwaltung</h1>
-      <p>Filamente, Lagerbestand und Druckparameter – gespeichert auf GitHub</p>
-    </div>
-    <div class="header-actions">
-      <span id="syncBadge" class="sync-badge offline">Nicht verbunden</span>
-      <button id="settingsBtn" class="secondary">GitHub-Verbindung</button>
-    </div>
+   <div>
+    <h1>
+     Filamentverwaltung
+    </h1>
+    <p>
+     Filamente, Lagerbestand und Druckparameter &ndash; gespeichert auf GitHub
+    </p>
+   </div>
+   <div class="header-actions">
+    <span class="sync-badge offline" id="syncBadge">
+     Nicht verbunden
+    </span>
+    <button class="secondary" id="settingsBtn">
+     GitHub-Verbindung
+    </button>
+   </div>
   </header>
-
   <main class="app-shell">
-    <section id="connectionNotice" class="notice info">
-      <strong>Noch nicht mit GitHub verbunden.</strong>
-      <span>Öffne „GitHub-Verbindung“ und hinterlege dein privates Daten-Repository.</span>
-    </section>
-
-    <section class="stats">
-      <div class="stat-card"><span class="stat-label">Filamente</span><strong id="statTypes">0</strong></div>
-      <div class="stat-card"><span class="stat-label">Rollen an Lager</span><strong id="statRolls">0</strong></div>
-      <div class="stat-card"><span class="stat-label">Bestellt</span><strong id="statOrdered">0</strong></div>
-      <div class="stat-card"><span class="stat-label">Lagerwert</span><strong id="statValue">CHF 0.00</strong></div>
-    </section>
-
-    <section class="toolbar">
-      <div class="search-wrap">
-        <input id="searchInput" type="search" placeholder="Hersteller, Art, Bezeichnung, Artikelnummer, Farbe, Lieferant suchen …">
-      </div>
-      <select id="statusFilter">
-        <option value="">Alle Status</option>
-        <option value="An Lager">An Lager</option>
-        <option value="Bestellt">Bestellt</option>
-        <option value="Leer">Leer</option>
-      </select>
-      <select id="typeFilter"><option value="">Alle Arten</option></select>
-      <button id="manageTypesBtn" class="secondary" disabled>Filament-Arten</button>
-      <button id="newFilamentBtn" class="primary" disabled>+ Filament erfassen</button>
-    </section>
-
-    <section class="table-card">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th data-sort="colorHex">Farbe <span class="sort-indicator"></span></th>
-              <th data-sort="manufacturer">Hersteller <span class="sort-indicator"></span></th>
-              <th data-sort="type">Art <span class="sort-indicator"></span></th>
-              <th data-sort="designation">Genaue Bezeichnung <span class="sort-indicator"></span></th>
-              <th data-sort="articleNumber">Artikelnummer <span class="sort-indicator"></span></th>
-              <th data-sort="priceKg">Preis/kg <span class="sort-indicator"></span></th>
-              <th data-sort="printTemp">Drucktemp. <span class="sort-indicator"></span></th>
-              <th data-sort="pressureAdvance">Pressure Advance <span class="sort-indicator"></span></th>
-              <th data-sort="flowRatio">Flow Ratio <span class="sort-indicator"></span></th>
-              <th data-sort="retraction">Rückzug <span class="sort-indicator"></span></th>
-              <th data-sort="volumetricSpeed">Volumetric Speed <span class="sort-indicator"></span></th>
-              <th data-sort="supplier">Lieferant <span class="sort-indicator"></span></th>
-              <th data-sort="status">Status <span class="sort-indicator"></span></th>
-              <th data-sort="rolls">Rollen <span class="sort-indicator"></span></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="filamentTableBody"></tbody>
-        </table>
-      </div>
-      <div id="emptyState" class="empty-state">
-        <strong>Noch keine Daten geladen.</strong>
-        <span>Verbinde die App zuerst mit deinem GitHub-Daten-Repository.</span>
-      </div>
-    </section>
-
-    <footer class="app-footer">
-      <span id="lastSync">Noch nicht synchronisiert</span>
-      <button id="reloadBtn" class="link-button" disabled>↻ Von GitHub neu laden</button>
-    </footer>
-  </main>
-
-  <dialog id="settingsDialog">
-    <form id="settingsForm">
-      <div class="dialog-header">
-        <div>
-          <h2>GitHub-Verbindung</h2>
-          <p>Die Zugangsdaten werden nur in diesem Browser gespeichert.</p>
-        </div>
-        <button type="button" id="closeSettingsBtn" class="icon-button">×</button>
-      </div>
-
-      <div class="settings-info">
-        Verwende ein <strong>Fine-grained Personal Access Token</strong>, das nur Zugriff auf dein privates
-        Filament-Daten-Repository hat. Benötigte Repository-Berechtigung: <strong>Contents – Read and write</strong>.
-      </div>
-
-      <div class="form-grid">
-        <label><span>GitHub-Benutzername *</span><input id="ghOwner" required placeholder="z. B. domi123"></label>
-        <label><span>Daten-Repository *</span><input id="ghRepo" required value="filament-data"></label>
-        <label class="span-2"><span>Branch</span><input id="ghBranch" value="main"></label>
-        <label class="span-2"><span>Fine-grained Token *</span><input id="ghToken" type="password" required placeholder="github_pat_…"></label>
-      </div>
-
-      <div class="dialog-actions">
-        <button id="forgetConnectionBtn" type="button" class="danger">Verbindung löschen</button>
-        <div class="dialog-actions-right">
-          <button id="testConnectionBtn" type="button" class="secondary">Verbindung testen</button>
-          <button type="submit" class="primary">Speichern & verbinden</button>
-        </div>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="filamentDialog">
-    <form id="filamentForm">
-      <div class="dialog-header">
-        <div><h2 id="dialogTitle">Filament erfassen</h2><p>Stammdaten und Slicer-Parameter</p></div>
-        <button type="button" id="closeDialogBtn" class="icon-button">×</button>
-      </div>
-      <input type="hidden" id="filamentId">
-
-      <div class="form-grid">
-        <label><span>Hersteller *</span><input id="manufacturer" required></label>
-        <label><span>Art *</span><select id="type" required></select></label>
-        <label><span>Genaue Bezeichnung</span><input id="designation" placeholder="z. B. PLA Basic Black"></label>
-        <label><span>Artikelnummer</span><input id="articleNumber"></label>
-        <label><span>Preis pro kg [CHF]</span><input id="priceKg" type="number" min="0" step="0.01"></label>
-        <div class="color-group">
-          <label><span>Farbe RGB</span><input id="colorRgb" placeholder="255, 120, 0"></label>
-          <label>
-            <span>Farbe HEX</span>
-            <div class="hex-row">
-              <input id="colorHex" placeholder="#FF7800" maxlength="7">
-              <input id="colorPicker" type="color" value="#808080">
-            </div>
-          </label>
-        </div>
-        <label><span>Drucktemperatur [°C]</span><input id="printTemp" placeholder="z. B. 210 oder 205–220"></label>
-        <label><span>Pressure Advance</span><input id="pressureAdvance" type="number" min="0" step="0.001"></label>
-        <label><span>Flow Ratio</span><input id="flowRatio" type="number" min="0" step="0.001"></label>
-        <label><span>Rückzug [mm]</span><input id="retraction" type="number" min="0" step="0.1"></label>
-        <label><span>Volumetric Speed [mm³/s]</span><input id="volumetricSpeed" type="number" min="0" step="0.1"></label>
-        <label><span>Lieferant</span><input id="supplier"></label>
-        <label>
-          <span>Status</span>
-          <select id="status">
-            <option value="An Lager">An Lager</option>
-            <option value="Bestellt">Bestellt</option>
-            <option value="Leer">Leer</option>
-          </select>
-        </label>
-        <label><span>Anzahl Rollen</span><input id="rolls" type="number" min="0" step="1" value="1"></label>
-      </div>
-
-      <div class="dialog-actions">
-        <button type="button" id="deleteBtn" class="danger" hidden>Löschen</button>
-        <div class="dialog-actions-right">
-          <button type="button" id="cancelBtn" class="secondary">Abbrechen</button>
-          <button type="submit" class="primary">Speichern & synchronisieren</button>
-        </div>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="typesDialog">
-    <div class="types-panel">
-      <div class="dialog-header">
-        <div><h2>Filament-Arten verwalten</h2><p>Die Liste wird im GitHub-Datenbestand gespeichert.</p></div>
-        <button type="button" id="closeTypesBtn" class="icon-button">×</button>
-      </div>
-      <div class="type-add-row">
-        <input id="newTypeInput" placeholder="Neue Art, z. B. TPU">
-        <button id="addTypeBtn" class="primary" type="button">Hinzufügen</button>
-      </div>
-      <div id="typeList" class="type-list"></div>
-      <div class="dialog-actions">
-        <span class="hint">Bereits verwendete Arten können nicht gelöscht werden.</span>
-        <button id="closeTypesBottomBtn" class="secondary" type="button">Schliessen</button>
-      </div>
+   <section class="notice info" id="connectionNotice">
+    <strong>
+     Noch nicht mit GitHub verbunden.
+    </strong>
+    <span>
+     &Ouml;ffne &bdquo;GitHub-Verbindung&ldquo; und hinterlege dein privates Daten-Repository.
+    </span>
+   </section>
+   <section class="stats">
+    <div class="stat-card">
+     <span class="stat-label">
+      Filamente
+     </span>
+     <strong id="statTypes">
+      0
+     </strong>
     </div>
+    <div class="stat-card">
+     <span class="stat-label">
+      Rollen an Lager
+     </span>
+     <strong id="statRolls">
+      0
+     </strong>
+    </div>
+    <div class="stat-card">
+     <span class="stat-label">
+      Bestellt
+     </span>
+     <strong id="statOrdered">
+      0
+     </strong>
+    </div>
+    <div class="stat-card">
+     <span class="stat-label">
+      Lagerwert
+     </span>
+     <strong id="statValue">
+      CHF 0.00
+     </strong>
+    </div>
+   </section>
+   <section class="toolbar">
+    <div class="search-wrap">
+     <input id="searchInput" placeholder="Hersteller, Art, Bezeichnung, Artikelnummer, Farbe, Lieferant suchen &hellip;" type="search"/>
+    </div>
+    <select id="statusFilter">
+     <option value="">
+      Alle Status
+     </option>
+     <option value="An Lager">
+      An Lager
+     </option>
+     <option value="Bestellt">
+      Bestellt
+     </option>
+     <option value="Leer">
+      Leer
+     </option>
+    </select>
+    <select id="typeFilter">
+     <option value="">
+      Alle Arten
+     </option>
+    </select>
+    <button class="secondary" disabled="" id="manageTypesBtn">
+     Filament-Arten
+    </button>
+    <button class="primary" disabled="" id="newFilamentBtn">
+     + Filament erfassen
+    </button>
+   </section>
+   <section class="table-card">
+    <div class="table-wrap">
+     <table>
+      <thead>
+       <tr>
+        <th data-sort="colorHex">
+         Farbe
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="manufacturer">
+         Hersteller
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="type">
+         Art
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="designation">
+         Genaue Bezeichnung
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="articleNumber">
+         Artikelnummer
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="priceKg">
+         Preis/kg
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="printTemp">
+         Drucktemp.
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="pressureAdvance">
+         Pressure Advance
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="flowRatio">
+         Flow Ratio
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="retraction">
+         R&uuml;ckzug
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="volumetricSpeed">
+         Volumetric Speed
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="supplier">
+         Lieferant
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="status">
+         Status
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th data-sort="rolls">
+         Rollen
+         <span class="sort-indicator">
+         </span>
+        </th>
+        <th>
+        </th>
+       </tr>
+      </thead>
+      <tbody id="filamentTableBody">
+      </tbody>
+     </table>
+    </div>
+    <div class="empty-state" id="emptyState">
+     <strong>
+      Noch keine Daten geladen.
+     </strong>
+     <span>
+      Verbinde die App zuerst mit deinem GitHub-Daten-Repository.
+     </span>
+    </div>
+   </section>
+   <footer class="app-footer">
+    <span id="lastSync">
+     Noch nicht synchronisiert
+    </span>
+    <button class="link-button" disabled="" id="reloadBtn">
+     &orarr; Von GitHub neu laden
+    </button>
+   </footer>
+  </main>
+  <dialog id="settingsDialog">
+   <form id="settingsForm">
+    <div class="dialog-header">
+     <div>
+      <h2>
+       GitHub-Verbindung
+      </h2>
+      <p>
+       Die Zugangsdaten werden nur in diesem Browser gespeichert.
+      </p>
+     </div>
+     <button class="icon-button" id="closeSettingsBtn" type="button">
+      &times;
+     </button>
+    </div>
+    <div class="settings-info">
+     Verwende ein
+     <strong>
+      Fine-grained Personal Access Token
+     </strong>
+     , das nur Zugriff auf dein privates
+        Filament-Daten-Repository hat. Ben&ouml;tigte Repository-Berechtigung:
+     <strong>
+      Contents &ndash; Read and write
+     </strong>
+     .
+    </div>
+    <div class="form-grid">
+     <label>
+      <span>
+       GitHub-Benutzername *
+      </span>
+      <input id="ghOwner" placeholder="z. B. domi123" required=""/>
+     </label>
+     <label>
+      <span>
+       Daten-Repository *
+      </span>
+      <input id="ghRepo" required="" value="filament-data"/>
+     </label>
+     <label class="span-2">
+      <span>
+       Branch
+      </span>
+      <input id="ghBranch" value="main"/>
+     </label>
+     <label class="span-2">
+      <span>
+       Fine-grained Token *
+      </span>
+      <input id="ghToken" placeholder="github_pat_&hellip;" required="" type="password"/>
+     </label>
+    </div>
+    <div class="dialog-actions">
+     <button class="danger" id="forgetConnectionBtn" type="button">
+      Verbindung l&ouml;schen
+     </button>
+     <div class="dialog-actions-right">
+      <button class="secondary" id="testConnectionBtn" type="button">
+       Verbindung testen
+      </button>
+      <button class="primary" type="submit">
+       Speichern &amp; verbinden
+      </button>
+     </div>
+    </div>
+   </form>
   </dialog>
-
-  <script src="app.js"></script>
-</body>
+  <dialog id="filamentDialog">
+   <form id="filamentForm">
+    <div class="dialog-header">
+     <div>
+      <h2 id="dialogTitle">
+       Filament erfassen
+      </h2>
+      <p>
+       Stammdaten und Slicer-Parameter
+      </p>
+     </div>
+     <button class="icon-button" id="closeDialogBtn" type="button">
+      &times;
+     </button>
+    </div>
+    <input id="filamentId" type="hidden"/>
+    <div class="form-grid">
+     <label>
+      <span>
+       Hersteller *
+      </span>
+      <input id="manufacturer" required=""/>
+     </label>
+     <label>
+      <span>
+       Art *
+      </span>
+      <select id="type" required="">
+      </select>
+     </label>
+     <label>
+      <span>
+       Genaue Bezeichnung
+      </span>
+      <input id="designation" placeholder="z. B. PLA Basic Black"/>
+     </label>
+     <label>
+      <span>
+       Artikelnummer
+      </span>
+      <input id="articleNumber"/>
+     </label>
+     <label>
+      <span>
+       Preis pro kg [CHF]
+      </span>
+      <input id="priceKg" min="0" step="0.01" type="number"/>
+     </label>
+     <div class="color-group">
+      <label>
+       <span>
+        Farbe RGB
+       </span>
+       <input id="colorRgb" placeholder="255, 120, 0"/>
+      </label>
+      <label>
+       <span>
+        Farbe HEX
+       </span>
+       <div class="hex-row">
+        <input id="colorHex" maxlength="7" placeholder="#FF7800"/>
+        <input id="colorPicker" type="color" value="#808080"/>
+       </div>
+      </label>
+     </div>
+     <label>
+      <span>
+       Drucktemperatur [&deg;C]
+      </span>
+      <input id="printTemp" placeholder="z. B. 210 oder 205&ndash;220"/>
+     </label>
+     <label>
+      <span>
+       Pressure Advance
+      </span>
+      <input id="pressureAdvance" min="0" step="0.001" type="number"/>
+     </label>
+     <label>
+      <span>
+       Flow Ratio
+      </span>
+      <input id="flowRatio" min="0" step="0.001" type="number"/>
+     </label>
+     <label>
+      <span>
+       R&uuml;ckzug [mm]
+      </span>
+      <input id="retraction" min="0" step="0.1" type="number"/>
+     </label>
+     <label>
+      <span>
+       Volumetric Speed [mm&sup3;/s]
+      </span>
+      <input id="volumetricSpeed" min="0" step="0.1" type="number"/>
+     </label>
+     <label>
+      <span>
+       Lieferant
+      </span>
+      <input id="supplier"/>
+     </label>
+     <label>
+      <span>
+       Status
+      </span>
+      <select id="status">
+       <option value="An Lager">
+        An Lager
+       </option>
+       <option value="Bestellt">
+        Bestellt
+       </option>
+       <option value="Leer">
+        Leer
+       </option>
+      </select>
+     </label>
+     <label>
+      <span>
+       Anzahl Rollen
+      </span>
+      <input id="rolls" min="0" step="1" type="number" value="1"/>
+     </label>
+    </div>
+    <div class="dialog-actions">
+     <button class="danger" hidden="" id="deleteBtn" type="button">
+      L&ouml;schen
+     </button>
+     <div class="dialog-actions-right">
+      <button class="secondary" id="cancelBtn" type="button">
+       Abbrechen
+      </button>
+      <button class="primary" type="submit">
+       Speichern &amp; synchronisieren
+      </button>
+     </div>
+    </div>
+   </form>
+  </dialog>
+  <dialog id="typesDialog">
+   <div class="types-panel">
+    <div class="dialog-header">
+     <div>
+      <h2>
+       Filament-Arten verwalten
+      </h2>
+      <p>
+       Die Liste wird im GitHub-Datenbestand gespeichert.
+      </p>
+     </div>
+     <button class="icon-button" id="closeTypesBtn" type="button">
+      &times;
+     </button>
+    </div>
+    <div class="type-add-row">
+     <input id="newTypeInput" placeholder="Neue Art, z. B. TPU"/>
+     <button class="primary" id="addTypeBtn" type="button">
+      Hinzuf&uuml;gen
+     </button>
+    </div>
+    <div class="type-list" id="typeList">
+    </div>
+    <div class="dialog-actions">
+     <span class="hint">
+      Bereits verwendete Arten k&ouml;nnen nicht gel&ouml;scht werden.
+     </span>
+     <button class="secondary" id="closeTypesBottomBtn" type="button">
+      Schliessen
+     </button>
+    </div>
+   </div>
+  </dialog>
+  <script src="app.js">
+  </script>
+ </body>
 </html>
