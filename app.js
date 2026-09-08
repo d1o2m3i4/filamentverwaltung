@@ -299,6 +299,17 @@ el("typeList").addEventListener("click",async e=>{
   const b=e.target.closest("button[data-type]");if(!b||b.disabled)return;const old=[...filamentTypes];filamentTypes=filamentTypes.filter(t=>t!==b.dataset.type);renderTypesDialog();renderTypeFilter();
   try{await saveToGitHub("Filament-Art löschen")}catch(err){filamentTypes=old;renderTypesDialog();renderTypeFilter();alert(err.message)}
 });
+
+document.querySelectorAll(".star-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    updateRatingStars(Number(btn.dataset.rating));
+  });
+});
+
+el("clearRatingBtn").addEventListener("click",()=>{
+  updateRatingStars(0);
+});
+
 el("reloadBtn").addEventListener("click",loadFromGitHub);
 
 render();
