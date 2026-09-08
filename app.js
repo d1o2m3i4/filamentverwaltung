@@ -36,9 +36,20 @@ function apiUrl(path=""){return`https://api.github.com/repos/${encodeURIComponen
 function apiHeaders(){return{"Accept":"application/vnd.github+json","Authorization":`Bearer ${config.token}`,"X-GitHub-Api-Version":API_VERSION}}
 
 function setSync(state,text){const b=el("syncBadge");b.className="sync-badge "+state;b.textContent=text}
-function setConnected(on){
-  connected=on;el("newFilamentBtn").disabled=!on;el("manageTypesBtn").disabled=!on;el("reloadBtn").disabled=!on;
-  el("connectionNotice").hidden=on;
+function setConnected(on) {
+    connected = on;
+
+    el("newFilamentBtn").disabled = !on;
+    el("manageTypesBtn").disabled = !on;
+    el("reloadBtn").disabled = !on;
+
+    const notice = el("connectionNotice");
+
+    // Doppelte Absicherung:
+    // 1. Standard-HTML-Attribut "hidden"
+    // 2. Direktes CSS, damit der Hinweis in jedem Browser sicher verschwindet.
+    notice.hidden = on;
+    notice.style.display = on ? "none" : "flex";
 }
 
 async function ghFetch(url,options={}){
@@ -91,7 +102,9 @@ async function loadFromGitHub(){
     el("lastSync").textContent="Zuletzt geladen: "+new Date().toLocaleString("de-CH");
   }catch(e){
     console.error(e);setConnected(false);setSync("error","Verbindung fehlgeschlagen");
-    el("connectionNotice").hidden=false;el("connectionNotice").className="notice error";
+    el("connectionNotice").hidden = false;
+    el("connectionNotice").style.display = "flex";
+    el("connectionNotice").className = "notice error";
     el("connectionNotice").innerHTML=`<strong>GitHub-Verbindung fehlgeschlagen.</strong><span>${escapeHtml(e.message)}</span>`;
   }
 }
@@ -231,7 +244,9 @@ el("settingsForm").addEventListener("submit",async e=>{
 el("forgetConnectionBtn").addEventListener("click",()=>{
   if(!confirm("Gespeicherte GitHub-Verbindung in diesem Browser wirklich löschen?"))return;
   clearConfig();filaments=[];filamentTypes=[...DEFAULT_TYPES];fileSha=null;setConnected(false);setSync("offline","Nicht verbunden");
-  el("connectionNotice").hidden=false;el("connectionNotice").className="notice info";
+  el("connectionNotice").hidden = false;
+  el("connectionNotice").style.display = "flex";
+  el("connectionNotice").className = "notice info";
   el("connectionNotice").innerHTML="<strong>Noch nicht mit GitHub verbunden.</strong><span>Öffne „GitHub-Verbindung“ und hinterlege dein privates Daten-Repository.</span>";
   settingsDialog.close();render();
 });
