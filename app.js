@@ -319,3 +319,169 @@ el("reloadBtn").addEventListener("click",loadFromGitHub);
 
 render();
 if(isConfigured())loadFromGitHub();
+
+
+
+const CALC_ROWS = 8;
+
+function chf(value) {
+  return `CHF ${Number(value || 0).toFixed(2)}`;
+}
+
+function getAvailableFilaments() {
+  return [...filaments]
+    .filter(item => item.status === "An Lager" && Number(item.rolls || 0) > 0)
+    .sort((a, b) => {
+      const aa = `${a.manufacturer || ""} ${a.type || ""} ${a.designation || ""}`.toLowerCase();
+      const bb = `${b.manufacturer || ""} ${b.type || ""} ${b.designation || ""}`.toLowerCase();
+      return aa.localeCompare(bb, "de");
+    });
+}
+
+function filamentOptionLabel(item) {
+  const parts = [
+    item.manufacturer,
+    item.type,
+    item.designation,
+    item.colorHex,
+    item.priceKg !== "" && item.priceKg != null ? `${Number(item.priceKg).toFixed(2)} CHF/kg` : ""
+  ].filter(Boolean);
+
+  return parts.join(" · ");
+}
+
+function buildCostCalculatorRows() {
+  const list = el("filamentCostList");
+  if (!list) return;
+
+  const selected = Array.from(list.querySelectorAll(".calc-filament-select")).map(s => s.value);
+  const grams = Array.from(list.querySelectorAll(".calc-filament-grams")).map(i => i.value);
+  const available = getAvailableFilaments();
+
+  list.innerHTML = "";
+
+  for (let index = 0; index < CALC_ROWS; index++) {
+    const row = document.createElement("div");
+    row.className = "filament-cost-row";
+
+    const selectLabel = document.createElement("label");
+    selectLabel.innerHTML = `<span>Filament ${index + 1}</span>`;
+
+    const select = document.createElement("select");
+    select.className = "calc-filament-select";
+    select.innerHTML = `<option value="">– nicht verwendet –</option>`;
+
+    available.forEach(item => {
+      const option = document.createElement("option");
+      option.value = String(item.id);
+      option.textContent = filamentOptionLabel(item);
+      select.appendChild(option);
+    });
+
+    if (selected[index] && [...select.options].some(o => o.value === selected[index])) {
+      select.value = selected[index];
+    }
+
+    selectLabel.appendChild(select);
+
+    const gramLabel = document.createElement("label");
+    gramLabel.innerHTML = `<span>Verbrauch [g]</span>`;
+
+    const gramInput = document.createElement("input");
+    gramInput.className = "calc-filament-grams";
+    gramInput.type = "number";
+    gramInput.min = "0";
+    gramInput.step = "1";
+    gramInput.value = grams[index] || "0";
+    gramLabel.appendChild(gramInput);
+
+    const lineCost = document.createElement("div");
+    lineCost.className = "line-cost";
+    lineCost.textContent = "CHF 0.00";
+
+    select.addEventListener("change", calculatePrintCost);
+    gramInput.addEventListener("input", calculatePrintCost);
+
+    row.append(selectLabel, gramLabel, lineCost);
+    list.appendChild(row);
+  }
+
+  calculatePrintCost();
+}
+
+function calculatePrintCost() {
+  const list = el("filamentCostList");
+  if (!list) return;
+
+  let filamentCost = 0;
+  const rows = [...list.querySelectorAll(".filament-cost-row")];
+
+  rows.forEach(row => {
+    const select = row.querySelector(".calc-filament-select");
+    const gramsInput = row.querySelector(".calc-filament-grams");
+    const lineCostEl = row.querySelector(".line-cost");
+
+    const item = filaments.find(f => String(f.id) === String(select.value));
+    const grams = Math.max(0, Number(gramsInput.value || 0));
+    const priceKg = item ? Math.max(0, Number(item.priceKg || 0)) : 0;
+    const cost = (grams / 1000) * priceKg;
+
+    filamentCost += cost;
+    lineCostEl.textContent = chf(cost);
+  });
+
+  const machineHours = Math.max(0, Number(el("calcMachineHours")?.value || 0));
+  const laborMinutes = Math.max(0, Number(el("calcLaborMinutes")?.value || 0));
+  const machineRate = Math.max(0, Number(el("calcMachineRate")?.value || 0));
+  const laborRate = Math.max(0, Number(el("calcLaborRate")?.value || 0));
+  const overhead = Math.max(0, Number(el("calcOverhead")?.value || 0));
+  const powerPrice = Math.max(0, Number(el("calcPowerPrice")?.value || 0));
+  const powerUse = Math.max(0, Number(el("calcPowerUse")?.value || 0));
+  const margin = Math.max(0, Number(el("calcMargin")?.value || 0));
+
+  const machineCost = machineHours * machineRate;
+  const laborCost = (laborMinutes / 60) * laborRate;
+  const powerCost = machineHours * powerUse * powerPrice;
+  const subtotal = filamentCost + machineCost + laborCost + powerCost + overhead;
+  const profit = subtotal * (margin / 100);
+  const total = subtotal + profit;
+
+  el("calcFilamentCost").textContent = chf(filamentCost);
+  el("calcMachineCost").textContent = chf(machineCost);
+  el("calcLaborCost").textContent = chf(laborCost);
+  el("calcPowerCost").textContent = chf(powerCost);
+  el("calcOverheadCost").textContent = chf(overhead);
+  el("calcSubtotal").textContent = chf(subtotal);
+  el("calcProfit").textContent = chf(profit);
+  el("calcTotal").textContent = chf(total);
+}
+
+function initCostCalculator() {
+  if (!el("filamentCostList")) return;
+
+  [
+    "calcMachineHours",
+    "calcLaborMinutes",
+    "calcMachineRate",
+    "calcLaborRate",
+    "calcOverhead",
+    "calcPowerPrice",
+    "calcPowerUse",
+    "calcMargin"
+  ].forEach(id => {
+    el(id)?.addEventListener("input", calculatePrintCost);
+  });
+
+  buildCostCalculatorRows();
+}
+
+
+window.addEventListener("load",initCostCalculator);
+
+const originalRenderForCalculator = render;
+render = function() {
+  originalRenderForCalculator();
+  if (document.getElementById("filamentCostList")) {
+    buildCostCalculatorRows();
+  }
+};

@@ -7,10 +7,10 @@
   <title>
    Filamentverwaltung
   </title>
-  <link href="style.css?v=6" rel="stylesheet"/>
+  <link href="style.css?v=7" rel="stylesheet"/>
  </head>
  <body>
-  <div id="appVersion" class="app-version">Version 6 · Sternebewertung</div>
+  <div id="appVersion" class="app-version">Version 7 · Druckkosten-Rechner</div>
   <header class="app-header">
    <div>
     <h1>
@@ -208,7 +208,76 @@
     </button>
    </footer>
   </main>
-  <dialog id="settingsDialog">
+  
+  <section class="cost-calculator card" id="costCalculator">
+   <div class="section-head">
+    <div>
+     <h2>Druckkosten-Rechner</h2>
+     <p>Berechnet Material, Maschinenzeit, Arbeitszeit, Strom, Nebenkosten und Gewinnmarge.</p>
+    </div>
+   </div>
+
+   <div class="calculator-grid">
+    <div class="calculator-main">
+     <h3>Filamentverbrauch</h3>
+     <p class="muted">Bis zu 8 Filamente aus dem vorhandenen Lager auswählen.</p>
+     <div class="filament-cost-list" id="filamentCostList"></div>
+
+     <div class="calculator-times">
+      <label>
+       <span>Maschinenzeit [h]</span>
+       <input id="calcMachineHours" min="0" step="0.1" type="number" value="0"/>
+      </label>
+      <label>
+       <span>Arbeitszeit [min]</span>
+       <input id="calcLaborMinutes" min="0" step="1" type="number" value="0"/>
+      </label>
+     </div>
+    </div>
+
+    <div class="calculator-settings">
+     <h3>Ansätze</h3>
+     <label>
+      <span>Maschinenzeit [CHF/h]</span>
+      <input id="calcMachineRate" min="0" step="0.01" type="number" value="2.00"/>
+     </label>
+     <label>
+      <span>Arbeitszeit [CHF/h]</span>
+      <input id="calcLaborRate" min="0" step="0.01" type="number" value="50.00"/>
+     </label>
+     <label>
+      <span>Nebenkosten pauschal [CHF]</span>
+      <input id="calcOverhead" min="0" step="0.01" type="number" value="2.00"/>
+     </label>
+     <label>
+      <span>Strompreis [CHF/kWh]</span>
+      <input id="calcPowerPrice" min="0" step="0.001" type="number" value="0.277"/>
+     </label>
+     <label>
+      <span>Verbrauch Drucker [kWh/h]</span>
+      <input id="calcPowerUse" min="0" step="0.01" type="number" value="0.20"/>
+     </label>
+     <label>
+      <span>Gewinnmarge [%]</span>
+      <input id="calcMargin" min="0" step="0.1" type="number" value="10"/>
+     </label>
+    </div>
+
+    <div class="calculator-summary">
+     <h3>Kalkulation</h3>
+     <div class="cost-row"><span>Filament</span><strong id="calcFilamentCost">CHF 0.00</strong></div>
+     <div class="cost-row"><span>Maschinenzeit</span><strong id="calcMachineCost">CHF 0.00</strong></div>
+     <div class="cost-row"><span>Arbeitszeit</span><strong id="calcLaborCost">CHF 0.00</strong></div>
+     <div class="cost-row"><span>Strom</span><strong id="calcPowerCost">CHF 0.00</strong></div>
+     <div class="cost-row"><span>Nebenkosten</span><strong id="calcOverheadCost">CHF 2.00</strong></div>
+     <div class="cost-row total"><span>Selbstkosten</span><strong id="calcSubtotal">CHF 2.00</strong></div>
+     <div class="cost-row"><span>Gewinn</span><strong id="calcProfit">CHF 0.20</strong></div>
+     <div class="cost-row grand-total"><span>Verkaufspreis</span><strong id="calcTotal">CHF 2.20</strong></div>
+    </div>
+   </div>
+  </section>
+
+<dialog id="settingsDialog">
    <form id="settingsForm">
     <div class="dialog-header">
      <div>
@@ -462,7 +531,7 @@
     </div>
    </div>
   </dialog>
-  <script src="app.js?v=6">
+  <script src="app.js?v=7">
   </script>
  </body>
 </html>
