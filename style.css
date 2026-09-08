@@ -800,22 +800,9 @@ dialog::backdrop {
     margin-bottom: 4px;
 }
 
-.calc-chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    justify-content: flex-end;
-}
 
-.calc-chip {
-    padding: 6px 9px;
-    border-radius: 999px;
-    background: #f3f4f6;
-    border: 1px solid var(--border);
-    color: #4b5563;
-    font-size: 12px;
-    font-weight: 600;
-}
+
+
 
 .calculator-grid {
     grid-template-columns: minmax(0, 1.45fr) minmax(270px, 0.75fr) minmax(300px, 0.8fr);
@@ -843,7 +830,7 @@ dialog::backdrop {
 }
 
 .filament-cost-row {
-    grid-template-columns: minmax(240px, 1fr) 120px 105px;
+    grid-template-columns: minmax(240px, 1fr) 82px 105px;
     padding: 10px;
     border: 1px solid #eef0f3;
     border-radius: 10px;
@@ -931,9 +918,7 @@ dialog::backdrop {
         position: static;
     }
 
-    .calc-chip-row {
-        justify-content: flex-start;
-    }
+    
 }
 
 @media (max-width: 700px) {
@@ -959,7 +944,10 @@ dialog::backdrop {
         display: block;
     }
 
-    .calc-chip-row {
-        margin-top: 12px;
-    }
+    
+}
+
+.calc-filament-grams {
+    width: 82px;
+    max-width: 82px;
 }
