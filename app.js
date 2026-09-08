@@ -4,6 +4,7 @@ const DATA_PATH="filamente.json";
 const API_VERSION="2022-11-28";
 
 let config=loadConfig(),filaments=[],filamentTypes=[...DEFAULT_TYPES],fileSha=null,sortState={key:"manufacturer",direction:"asc"},connected=false,saving=false;
+let currentRating=0;
 
 const el=id=>document.getElementById(id);
 const tableBody=el("filamentTableBody"),dialog=el("filamentDialog"),typesDialog=el("typesDialog"),settingsDialog=el("settingsDialog"),form=el("filamentForm"),emptyState=el("emptyState");
@@ -41,10 +42,11 @@ function renderRating(value){
 }
 
 function updateRatingStars(value){
-  const rating=Math.max(0,Math.min(5,Number(value||0)));
-  fields.rating.value=rating;
+  currentRating=Math.max(0,Math.min(5,Number(value||0)));
+  fields.rating.value=String(currentRating);
+
   document.querySelectorAll(".star-btn").forEach(btn=>{
-    btn.classList.toggle("active",Number(btn.dataset.rating)<=rating);
+    btn.classList.toggle("active",Number(btn.dataset.rating)<=currentRating);
   });
 }
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
@@ -237,7 +239,7 @@ function formObject(){
     articleNumber:fields.articleNumber.value.trim(),priceKg:fields.priceKg.value===""?"":Number(fields.priceKg.value),colorRgb:rgb,colorHex:hex,
     printTemp:fields.printTemp.value.trim(),pressureAdvance:fields.pressureAdvance.value===""?"":Number(fields.pressureAdvance.value),
     flowRatio:fields.flowRatio.value===""?"":Number(fields.flowRatio.value),retraction:fields.retraction.value===""?"":Number(fields.retraction.value),
-    volumetricSpeed:fields.volumetricSpeed.value===""?"":Number(fields.volumetricSpeed.value),rating:Number(fields.rating.value||0),supplier:fields.supplier.value.trim(),status:fields.status.value,
+    volumetricSpeed:fields.volumetricSpeed.value===""?"":Number(fields.volumetricSpeed.value),rating:currentRating,supplier:fields.supplier.value.trim(),status:fields.status.value,
     rolls:fields.rolls.value===""?0:Number(fields.rolls.value)};
 }
 
@@ -301,12 +303,15 @@ el("typeList").addEventListener("click",async e=>{
 });
 
 document.querySelectorAll(".star-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
+  btn.addEventListener("click",e=>{
+    e.preventDefault();
+    e.stopPropagation();
     updateRatingStars(Number(btn.dataset.rating));
   });
 });
 
-el("clearRatingBtn").addEventListener("click",()=>{
+el("clearRatingBtn").addEventListener("click",e=>{
+  e.preventDefault();
   updateRatingStars(0);
 });
 
