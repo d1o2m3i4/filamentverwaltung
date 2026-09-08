@@ -12,7 +12,7 @@ const fields={
   id:el("filamentId"),manufacturer:el("manufacturer"),type:el("type"),designation:el("designation"),
   articleNumber:el("articleNumber"),priceKg:el("priceKg"),colorRgb:el("colorRgb"),colorHex:el("colorHex"),
   printTemp:el("printTemp"),pressureAdvance:el("pressureAdvance"),flowRatio:el("flowRatio"),
-  retraction:el("retraction"),volumetricSpeed:el("volumetricSpeed"),supplier:el("supplier"),
+  retraction:el("retraction"),volumetricSpeed:el("volumetricSpeed"),rating:el("rating"),supplier:el("supplier"),
   status:el("status"),rolls:el("rolls")
 };
 
@@ -29,6 +29,24 @@ function hexToRgb(hex){const h=normalizeHex(hex);if(!h)return"";const n=parseInt
 function fmtCurrency(v){return new Intl.NumberFormat("de-CH",{style:"currency",currency:"CHF"}).format(Number(v||0))}
 function fmtNumber(v){return v===""||v==null?"–":String(v)}
 function statusClass(s){return s==="An Lager"?"status-in-stock":s==="Bestellt"?"status-ordered":"status-empty"}
+
+function renderRating(value){
+  const rating=Math.max(0,Math.min(5,Number(value||0)));
+  if(!rating)return '<span class="table-rating">–</span>';
+  let html='<span class="table-rating" aria-label="'+rating+' von 5 Sternen">';
+  for(let n=1;n<=5;n++){
+    html+='<span class="'+(n<=rating?'filled':'empty')+'">★</span>';
+  }
+  return html+'</span>';
+}
+
+function updateRatingStars(value){
+  const rating=Math.max(0,Math.min(5,Number(value||0)));
+  fields.rating.value=rating;
+  document.querySelectorAll(".star-btn").forEach(btn=>{
+    btn.classList.toggle("active",Number(btn.dataset.rating)<=rating);
+  });
+}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function utf8ToBase64(str){const bytes=new TextEncoder().encode(str);let binary="";for(const b of bytes)binary+=String.fromCharCode(b);return btoa(binary)}
 function base64ToUtf8(b64){const binary=atob(b64.replace(/\n/g,""));const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes)}
@@ -77,7 +95,7 @@ function normalizePayload(payload){
     designation:item.designation||item.typeExact||"",articleNumber:item.articleNumber||"",
     priceKg:item.priceKg??"",colorRgb:item.colorRgb||"",colorHex:normalizeHex(item.colorHex)||rgbToHex(item.colorRgb)||"",
     printTemp:item.printTemp||"",pressureAdvance:item.pressureAdvance??"",flowRatio:item.flowRatio??"",
-    retraction:item.retraction??"",volumetricSpeed:item.volumetricSpeed??"",supplier:item.supplier||"",
+    retraction:item.retraction??"",volumetricSpeed:item.volumetricSpeed??"",rating:Number(item.rating||0),supplier:item.supplier||"",
     status:["Leer","Bestellt","An Lager"].includes(item.status)?item.status:"An Lager",rolls:Number(item.rolls||0)
   }));
   filamentTypes=uniqueSorted([...DEFAULT_TYPES,...(payload?.filamentTypes||[]),...filaments.map(f=>f.type)]);
@@ -144,7 +162,7 @@ async function saveToGitHub(message="Filamentdaten aktualisieren"){
 }
 
 function compareValues(a,b,key){
-  const numeric=["priceKg","pressureAdvance","flowRatio","retraction","volumetricSpeed","rolls"];
+  const numeric=["priceKg","pressureAdvance","flowRatio","retraction","volumetricSpeed","rating","rolls"];
   if(numeric.includes(key)){const av=a[key]===""?Infinity:Number(a[key]),bv=b[key]===""?Infinity:Number(b[key]);return av-bv}
   return String(a[key]??"").localeCompare(String(b[key]??""),"de",{numeric:true,sensitivity:"base"});
 }
@@ -164,7 +182,7 @@ function render(){
       escapeHtml(i.manufacturer)||"–",escapeHtml(i.type)||"–",escapeHtml(i.designation)||"–",escapeHtml(i.articleNumber)||"–",
       i.priceKg!==""?fmtCurrency(i.priceKg):"–",escapeHtml(i.printTemp)||"–",fmtNumber(i.pressureAdvance),fmtNumber(i.flowRatio),
       i.retraction!==""?`${fmtNumber(i.retraction)} mm`:"–",i.volumetricSpeed!==""?`${fmtNumber(i.volumetricSpeed)} mm³/s`:"–",
-      escapeHtml(i.supplier)||"–",`<span class="status-badge ${statusClass(i.status)}">${escapeHtml(i.status)}</span>`,fmtNumber(i.rolls)
+      renderRating(i.rating),escapeHtml(i.supplier)||"–",`<span class="status-badge ${statusClass(i.status)}">${escapeHtml(i.status)}</span>`,fmtNumber(i.rolls)
     ];
     cells.forEach(html=>{const td=document.createElement("td");td.innerHTML=html;tr.appendChild(td)});
     const td=document.createElement("td");td.innerHTML=`<div class="row-actions"><button class="edit-btn" data-id="${i.id}">Bearbeiten</button></div>`;tr.appendChild(td);
@@ -202,7 +220,7 @@ function renderTypesDialog(){
 }
 
 function openNew(){
-  form.reset();fields.id.value="";fields.status.value="An Lager";fields.rolls.value="1";el("colorPicker").value="#808080";renderTypeSelect();
+  form.reset();fields.id.value="";fields.status.value="An Lager";fields.rolls.value="1";el("colorPicker").value="#808080";updateRatingStars(0);renderTypeSelect();
   el("dialogTitle").textContent="Filament erfassen";el("deleteBtn").hidden=true;dialog.showModal();fields.manufacturer.focus();
 }
 function openEdit(id){
@@ -210,7 +228,7 @@ function openEdit(id){
   fields.id.value=i.id;fields.manufacturer.value=i.manufacturer;renderTypeSelect(i.type);fields.designation.value=i.designation;fields.articleNumber.value=i.articleNumber;
   fields.priceKg.value=i.priceKg;fields.colorRgb.value=i.colorRgb;fields.colorHex.value=i.colorHex;fields.printTemp.value=i.printTemp;
   fields.pressureAdvance.value=i.pressureAdvance;fields.flowRatio.value=i.flowRatio;fields.retraction.value=i.retraction;
-  fields.volumetricSpeed.value=i.volumetricSpeed;fields.supplier.value=i.supplier;fields.status.value=i.status;fields.rolls.value=i.rolls;
+  fields.volumetricSpeed.value=i.volumetricSpeed;updateRatingStars(i.rating);fields.supplier.value=i.supplier;fields.status.value=i.status;fields.rolls.value=i.rolls;
   el("colorPicker").value=normalizeHex(i.colorHex)||"#808080";el("dialogTitle").textContent="Filament bearbeiten";el("deleteBtn").hidden=false;dialog.showModal();
 }
 function formObject(){
@@ -219,7 +237,7 @@ function formObject(){
     articleNumber:fields.articleNumber.value.trim(),priceKg:fields.priceKg.value===""?"":Number(fields.priceKg.value),colorRgb:rgb,colorHex:hex,
     printTemp:fields.printTemp.value.trim(),pressureAdvance:fields.pressureAdvance.value===""?"":Number(fields.pressureAdvance.value),
     flowRatio:fields.flowRatio.value===""?"":Number(fields.flowRatio.value),retraction:fields.retraction.value===""?"":Number(fields.retraction.value),
-    volumetricSpeed:fields.volumetricSpeed.value===""?"":Number(fields.volumetricSpeed.value),supplier:fields.supplier.value.trim(),status:fields.status.value,
+    volumetricSpeed:fields.volumetricSpeed.value===""?"":Number(fields.volumetricSpeed.value),rating:Number(fields.rating.value||0),supplier:fields.supplier.value.trim(),status:fields.status.value,
     rolls:fields.rolls.value===""?0:Number(fields.rolls.value)};
 }
 

@@ -161,6 +161,11 @@
          <span class="sort-indicator">
          </span>
         </th>
+        <th data-sort="rating">
+         Bewertung
+         <span class="sort-indicator">
+         </span>
+        </th>
         <th data-sort="supplier">
          Lieferant
          <span class="sort-indicator">
@@ -365,6 +370,20 @@
       </span>
       <input id="volumetricSpeed" min="0" step="0.1" type="number"/>
      </label>
+     <div class="rating-field">
+      <span>
+       Bewertung
+      </span>
+      <div aria-label="Filament bewerten" class="star-rating" id="ratingStars">
+       <button aria-label="1 Stern" class="star-btn" data-rating="1" type="button">★</button>
+       <button aria-label="2 Sterne" class="star-btn" data-rating="2" type="button">★</button>
+       <button aria-label="3 Sterne" class="star-btn" data-rating="3" type="button">★</button>
+       <button aria-label="4 Sterne" class="star-btn" data-rating="4" type="button">★</button>
+       <button aria-label="5 Sterne" class="star-btn" data-rating="5" type="button">★</button>
+       <button class="clear-rating" id="clearRatingBtn" type="button">Keine</button>
+      </div>
+      <input id="rating" type="hidden" value="0"/>
+     </div>
      <label>
       <span>
        Lieferant
