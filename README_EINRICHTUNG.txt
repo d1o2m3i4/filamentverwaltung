@@ -202,3 +202,5 @@ WICHTIG: Vor produktivem Versand die QR-Rechnung und die Abmessungen des
 Zahlteils mit einem geeigneten QR-Rechnungsvalidator / Bank prüfen.
 Diese Version ist ein Prototyp, keine zertifizierte Fakturierungssoftware.
 Rechnungen sind ohne MWST-Ausweis; steuerliche Anforderungen selbst prüfen.
+
+Version 12: qr-local.js zusätzlich hochladen. PDF über Browser-Druckdialog «Als PDF speichern». Keine externen Bibliotheken erforderlich.

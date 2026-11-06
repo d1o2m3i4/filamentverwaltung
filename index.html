@@ -10,7 +10,7 @@
   <link href="style.css?v=10" rel="stylesheet"/>
  </head>
  <body>
-  <div id="appVersion" class="app-version">Version 10 · Rechnungen</div>
+  <div id="appVersion" class="app-version">Version 12 · Rechnungen</div>
   <div class="main-tabs-wrap">
    <nav class="main-tabs" id="mainTabs" aria-label="Hauptnavigation">
     <button class="main-tab active" id="tabManagement" type="button" data-tab="management">
@@ -314,7 +314,7 @@
       <div id="invoiceItems" class="invoice-items"></div>
       <div class="invoice-total"><span>Gesamtbetrag CHF</span><strong id="invoiceTotal">0.00</strong></div>
       <label class="invoice-note-label">Bemerkung<textarea id="invNote" rows="2" placeholder="Optionaler Hinweis auf der Rechnung"></textarea></label>
-      <div class="invoice-bottom-actions"><button class="secondary" id="invoiceSaveDraft" type="button">Entwurf speichern</button><button id="invoiceIssue" type="button">Rechnung ausstellen</button><button class="secondary" id="invoicePdf" type="button" disabled>PDF mit QR-Zahlteil</button></div>
+      <div class="invoice-bottom-actions"><button class="secondary" id="invoiceSaveDraft" type="button">Entwurf speichern</button><button id="invoiceIssue" type="button">Rechnung ausstellen</button><button class="secondary" id="invoicePdf" type="button" disabled>PDF / Drucken mit QR-Zahlteil</button></div>
       <p class="invoice-help" id="invoiceFeedback">Rechnungen werden im privaten GitHub-Repository in <code>rechnungen.json</code> gespeichert.</p>
      </section>
      <section class="card invoice-list"><h3>Gespeicherte Rechnungen</h3><div id="invoiceList">Noch keine Rechnungen geladen.</div></section>
@@ -576,10 +576,9 @@
     </div>
    </div>
   </dialog>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-  <script src="invoice.js?v=11"></script>
-  <script src="app.js?v=11">
+  <script src="qr-local.js?v=12"></script>
+  <script src="invoice.js?v=12"></script>
+  <script src="app.js?v=12">
   </script>
  </body>
 </html>
