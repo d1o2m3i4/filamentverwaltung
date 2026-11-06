@@ -7,10 +7,10 @@
   <title>
    Filamentverwaltung
   </title>
-  <link href="style.css?v=9" rel="stylesheet"/>
+  <link href="style.css?v=10" rel="stylesheet"/>
  </head>
  <body>
-  <div id="appVersion" class="app-version">Version 9 · Druckkosten</div>
+  <div id="appVersion" class="app-version">Version 10 · Rechnungen</div>
   <div class="main-tabs-wrap">
    <nav class="main-tabs" id="mainTabs" aria-label="Hauptnavigation">
     <button class="main-tab active" id="tabManagement" type="button" data-tab="management">
@@ -19,6 +19,7 @@
     <button class="main-tab" id="tabCalculator" type="button" data-tab="calculator">
      Druckkosten
     </button>
+    <button class="main-tab" id="tabInvoices" type="button" data-tab="invoices">Rechnungen</button>
    </nav>
   </div>
 
@@ -299,6 +300,28 @@
 
   </div>
 
+
+  <div class="tab-view" id="invoicesView">
+   <main class="app-shell invoice-shell">
+    <section class="card invoice-heading"><div><h2>Rechnungen</h2><p>Rechnungen erstellen, verwalten und als Schweizer QR-Rechnung ausgeben.</p></div><div class="invoice-actions"><button class="secondary" id="invoiceReload" type="button">Neu laden</button><button id="invoiceNew" type="button">+ Neue Rechnung</button></div></section>
+    <div class="invoice-layout">
+     <section class="card invoice-editor">
+      <div class="invoice-section-title"><h3>Absender &amp; Zahlung</h3><button class="secondary" id="invoiceSaveSettings" type="button">Absender speichern</button></div>
+      <div class="invoice-fields"><label>Firma / Name *<input id="invSellerName" autocomplete="organization"></label><label>Strasse *<input id="invSellerStreet"></label><label>Hausnummer<input id="invSellerNo"></label><label>PLZ *<input id="invSellerZip"></label><label>Ort *<input id="invSellerCity"></label><label>IBAN (CH / LI) *<input id="invIban" placeholder="CH00 0000 0000 0000 0000 0"></label></div>
+      <hr><div class="invoice-section-title"><h3>Rechnung</h3><span id="invoiceNumberPreview">Entwurf – Nummer bei Ausstellung</span></div>
+      <div class="invoice-fields"><label>Rechnungsdatum<input id="invDate" type="date"></label><label>Zahlungsfrist (Tage)<input id="invDays" type="number" min="0" value="30"></label><label>Empfänger / Firma *<input id="invCustomerName"></label><label>Strasse *<input id="invCustomerStreet"></label><label>Hausnummer<input id="invCustomerNo"></label><label>PLZ *<input id="invCustomerZip"></label><label>Ort *<input id="invCustomerCity"></label></div>
+      <div class="invoice-section-title"><h3>Positionen</h3><button class="secondary" id="invoiceAddItem" type="button">+ Position</button></div>
+      <div id="invoiceItems" class="invoice-items"></div>
+      <div class="invoice-total"><span>Gesamtbetrag CHF</span><strong id="invoiceTotal">0.00</strong></div>
+      <label class="invoice-note-label">Bemerkung<textarea id="invNote" rows="2" placeholder="Optionaler Hinweis auf der Rechnung"></textarea></label>
+      <div class="invoice-bottom-actions"><button class="secondary" id="invoiceSaveDraft" type="button">Entwurf speichern</button><button id="invoiceIssue" type="button">Rechnung ausstellen</button><button class="secondary" id="invoicePdf" type="button" disabled>PDF mit QR-Zahlteil</button></div>
+      <p class="invoice-help" id="invoiceFeedback">Rechnungen werden im privaten GitHub-Repository in <code>rechnungen.json</code> gespeichert.</p>
+     </section>
+     <section class="card invoice-list"><h3>Gespeicherte Rechnungen</h3><div id="invoiceList">Noch keine Rechnungen geladen.</div></section>
+    </div>
+   </main>
+  </div>
+
 <dialog id="settingsDialog">
    <form id="settingsForm">
     <div class="dialog-header">
@@ -553,7 +576,10 @@
     </div>
    </div>
   </dialog>
-  <script src="app.js?v=9">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="invoice.js?v=10"></script>
+  <script src="app.js?v=10">
   </script>
  </body>
 </html>

@@ -495,14 +495,18 @@ function setMainTab(tabName) {
   const calculatorTab = el("tabCalculator");
 
   const showCalculator = tabName === "calculator";
+  const showInvoices = tabName === "invoices";
 
-  management?.classList.toggle("active", !showCalculator);
+  management?.classList.toggle("active", !showCalculator && !showInvoices);
   calculator?.classList.toggle("active", showCalculator);
-  managementTab?.classList.toggle("active", !showCalculator);
+  el("invoicesView")?.classList.toggle("active", showInvoices);
+  el("tabInvoices")?.classList.toggle("active", showInvoices);
+  managementTab?.classList.toggle("active", !showCalculator && !showInvoices);
   calculatorTab?.classList.toggle("active", showCalculator);
 
-  localStorage.setItem("filament_active_tab_v1", showCalculator ? "calculator" : "management");
+  localStorage.setItem("filament_active_tab_v1", showInvoices ? "invoices" : showCalculator ? "calculator" : "management");
 
+  if (showInvoices && typeof invoiceLoad === "function") invoiceLoad();
   if (showCalculator) {
     buildCostCalculatorRows();
     calculatePrintCost();
@@ -541,9 +545,10 @@ function resetCalculator() {
 document.addEventListener("DOMContentLoaded", () => {
   el("tabManagement")?.addEventListener("click", () => setMainTab("management"));
   el("tabCalculator")?.addEventListener("click", () => setMainTab("calculator"));
+  el("tabInvoices")?.addEventListener("click", () => setMainTab("invoices"));
   el("resetCalculatorBtn")?.addEventListener("click", resetCalculator);
 
   const savedTab = localStorage.getItem("filament_active_tab_v1");
-  setMainTab(savedTab === "calculator" ? "calculator" : "management");
+  setMainTab(["calculator", "invoices"].includes(savedTab) ? savedTab : "management");
 });
 
